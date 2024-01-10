@@ -1,20 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import './App.css'
 import { Footer, Navbar } from './components'
 import { Route, Routes,Navigate,useLocation, Outlet } from 'react-router-dom'
 import { About, Auth, Companies, CompanyProfile, FindJob, JobDetail, UploadJob, UserProfile } from './pages'
 import { users } from './utils/data'
+import { useSelector } from 'react-redux'
+import InActive from './pages/inActive'
 
 const Layout = ()=>{
-  const user = users[0]
+  // const user = users[0]
+  const { user } = useSelector((state) => state.user);
   const location = useLocation()
-
-  return user ? <Outlet /> : <Navigate to = "user-auth" state = {{from:location}} replace />
+//  console.log(user)
+  return user?.name || user?.firstName ? <Outlet /> : <Navigate to = "user-auth" state = {{from:location}} replace />
+  return  <Outlet/>
 }
 
 function App() {
-let user = users[0]
+// let user = users[0]
+const { user } = useSelector((state) => state.user);
+
+
 
   return (
     <>
@@ -32,21 +39,23 @@ let user = users[0]
           />   
           <Route
             path={
-              user?.user?.accountType === "seeker"
+              user?.accountType === "seeker"
                 ? "/user-profile"
                 : "/user-profile/:id"
             }
             element={<UserProfile />}
           />
-
+          
           <Route path={"/company-profile"} element={<CompanyProfile />} />
           <Route path={"/company-profile/:id"} element={<CompanyProfile />} />
+          <Route path={"/applly-history"} element={<h5>This is page is in developement process</h5>}/>
           <Route path={"/upload-job"} element={<UploadJob />} />
           <Route path={"/job-detail/:id"} element={<JobDetail />} />              
           </Route>
           
           <Route path='/about-us' element={<About />} />
         <Route path='/user-auth' element={<Auth />} />
+        <Route path='/user-inactive' element={<InActive/> } />
         </Routes>
        {user && <Footer/> } 
       </main>

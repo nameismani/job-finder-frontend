@@ -3,14 +3,22 @@ import { Menu, Transition } from "@headlessui/react";
 import { BiChevronDown } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { HiMenuAlt3 } from "react-icons/hi";
+import { useForm } from "react-hook-form";
 import { AiOutlineClose, AiOutlineLogout } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CustomButton from "./CustomButton";
-import { users } from "../utils/data";
-import { useSelector } from "react-redux";
+// import { users } from "../utils/data";
+import { useDispatch, useSelector } from "react-redux";
+import { Logout } from "../redux/UserSlice";
+import { NoProfile } from "../assets";
 
 function MenuList({ user, onClick }) {
-  const handleLogout = () => {};
+ let  dispatch = useDispatch()
+ let Navigate = useNavigate()
+  const handleLogout = () => {
+    dispatch(Logout())
+    Navigate('/user-auth')
+  };
 
   return (
     <div>
@@ -27,7 +35,7 @@ function MenuList({ user, onClick }) {
             </div>
 
             <img
-              src={user?.profileUrl}
+              src={user?.profileUrl || NoProfile}
               alt='user profile'
               className='w-10 h-10 rounded-full object-cover '
             />
@@ -97,10 +105,10 @@ function MenuList({ user, onClick }) {
   );
 }
 const Navbar = () => {
-//   const user = useSelector((state) => state.user);
-const user = users[0]
+  const {user} = useSelector((state) => state.user);
+// const user = users[0]
   const [isOpen, setIsOpen] = useState(false);
-
+// console.log(user.accountType)
   const handleCloseNavbar = () => {
     setIsOpen((prev) => !prev);
   };
@@ -108,7 +116,7 @@ const user = users[0]
   return (
     <>
       <div className='relative bg-[#f7fdfd] z-50'>
-        <nav className='container mx-auto flex items-center justify-between p-5'>
+        <nav className='container mx-auto flex items-center justify-between p-5' >
           <div>
             <Link to='/' className='text-blue-600 font-bold text-xl'>
               Job<span className='text-[#1677cccb]'>Finder</span>
@@ -122,9 +130,20 @@ const user = users[0]
             <li>
               <Link to='/companies'>Companies</Link>
             </li>
-            <li>
+           {/* { user?.accountType !== "seeker" ? <li>
               <Link to='/upload-job'>Upload Job</Link>
-            </li>
+            </li> : null} */}
+
+          {
+            user ?          <Link
+
+            to={
+              user?.accountType === "seeker" ? "applly-history" : "upload-job"
+            }
+          >
+            {user?.accountType === "seeker" ? "Applications" : "Upload Job"}
+          </Link> : null
+          }
             <li>
               <Link to='/about-us'>About</Link>
             </li>
@@ -157,7 +176,7 @@ const user = users[0]
         <div
           className={`${
             isOpen ? "absolute flex bg-[#f7fdfd] " : "hidden"
-          } container mx-auto lg:hidden flex-col pl-8 gap-3 py-5`}
+          } container mx-auto lg:hidden flex-col pl-8 gap-3 py-5`} 
         >
           <Link to='/' onClick={handleCloseNavbar}>
             Find Job
