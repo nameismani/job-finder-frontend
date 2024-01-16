@@ -5,6 +5,7 @@ import CompanyProfile from "./CompanyProfile";
 import FindJob from "./FindJob";
 import JobDetail from "./JobDetail";
 import UploadJob from "./UploadJob";
+import ForgotPassword from "./ForgotPassword";
 import UserProfile from "./UserProfile";
 
-export {About,Auth,Companies,CompanyProfile,FindJob,JobDetail,UploadJob,UserProfile}
+export {About,Auth,Companies,CompanyProfile,FindJob,JobDetail,UploadJob,UserProfile,ForgotPassword}

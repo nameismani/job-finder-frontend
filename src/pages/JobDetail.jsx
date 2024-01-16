@@ -26,7 +26,7 @@ const JobDetail = () => {
         url:'/jobs/get-job-detail/' + id,
         method:"GET"
       });
-     console.log(res)
+    //  console.log(res)
       setJob(res?.data?.data);
       setSimilarJobs(res?.data?.similarJobs);
       setIsFetching(false)

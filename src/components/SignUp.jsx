@@ -1,20 +1,22 @@
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import TextInput from "./TextInput";
 import CustomButton from "./CustomButton";
 import { apiRequest } from "../utils";
 import { Login } from "../redux/UserSlice";
+import cookie from "js-cookie"
 
 const SignUp = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const location = useLocation();
+  let Navigate = useNavigate()
 
   const [isRegister, setIsRegister] = useState(true);
   const [accountType, setAccountType] = useState("seeker");
-
+  const [isLoading,setIsLoading] = useState(false)
   const [errMsg, setErrMsg] = useState("");
   const {
     register,
@@ -29,7 +31,7 @@ const SignUp = ({ open, setOpen }) => {
 
   const closeModal = () => setOpen(false);
 
-  const onSubmit = async(data) => {
+  const onSubmit = async(data,e) => {
     let URL = null
     if(isRegister){
     if (accountType === "seeker"){
@@ -44,27 +46,37 @@ const SignUp = ({ open, setOpen }) => {
        URL = "companies/login"
      }
   }
-
+  setIsLoading(true)
+// console.log(e)
   try{
     const res = await apiRequest({
       url:URL,
       data:data,
       method:"POST",
     });
+
     // console.log(res.data.success)
     if(res?.data?.success === "failed"){
       console.log("failed")
       setErrMsg(res?.data?.message);
+   
+      
     }else{
       setErrMsg("")
-      const data = {token:res?.data?.token,...res?.data?.user,session:res?.data?.session};
+      const data = {token:res?.data?.token,...res?.data?.user,session:res?.data?.session,userLogins:res?.data?.userLogins,role:res.data.role};
       // console.log(res.data.token)
+      let session = res?.data?.session
       dispatch(Login(data));
       localStorage.setItem("userInfo",JSON.stringify(data));
+      cookie.set("userInfo",JSON.stringify(session))
       // window.location.replace(from);
+      Navigate(from)
+      
     }
   }catch(err){
     console.log(err)
+  }finally{
+    setIsLoading(false)
   }
   };
 
@@ -204,7 +216,7 @@ const SignUp = ({ open, setOpen }) => {
                     )}
 
                     <div className='w-full flex gap-1 md:gap-2'>
-                      <div className={`${isRegister ? "w-1/2" : "w-full"}`}>
+                      <div className={`${isRegister ? "w-1/2 " : "w-full"}`}>
                         <TextInput
                           name='password'
                           label='Password'
@@ -217,7 +229,14 @@ const SignUp = ({ open, setOpen }) => {
                             errors.password ? errors.password?.message : ""
                           }
                         />
+                                                                                      <div 
+                        className =  {` ${isRegister?'hidden':'block'}text-sm ms-auto text-blue-600 ml-2 hover:text-blue-700 hover:font-semibold cursor-pointer`}
+                      
+                      >
+                       <Link to="/forgotpassword"> {isRegister ? "" : "Forogot Password?"}</Link>
                       </div>
+                    </div>
+                   
 
                       {isRegister && (
                         <div className='w-1/2'>
@@ -242,23 +261,26 @@ const SignUp = ({ open, setOpen }) => {
                             }
                           />
                         </div>
+                        
                       )}
-                    </div>
 
+
+                  </div>
+                    <div className='mt-2 flex flex-col gap-2'>
+                      
                     {errMsg && (
                       <span
                         role='alert'
-                        className='text-sm text-red-500 mt-0.5'
+                        className='text-sm text-red-500 my-2'
                       >
                         {errMsg}
                       </span>
                     )}
-
-                    <div className='mt-2'>
                       <CustomButton
                         type='submit'
                         containerStyles={`inline-flex justify-center rounded-md bg-blue-600 px-8 py-2 text-sm font-medium text-white outline-none hover:bg-blue-800`}
                         title={isRegister ? "Create Account" : "Login Account"}
+                        isLoading={isLoading}
                       />
                     </div>
                   </form>

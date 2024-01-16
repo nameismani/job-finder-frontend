@@ -97,7 +97,7 @@ const Footer = () => {
         <div className='bg-[#001a36]'>
           <div className='container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row'>
             <p className='text-gray-300 text-sm text-center sm:text-left'>
-              &copy; 2023 Job Finder —
+              &copy; {new Date().getFullYear()} Job Finder —
               <a
                 href='https://github.com/nameismani'
                 className='text-[#1199e7] ml-1'

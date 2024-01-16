@@ -9,8 +9,9 @@ import { CustomButton, TextInput } from "../components";
 import { NoProfile } from "../assets";
 import { useNavigate } from "react-router-dom";
 import { apiRequest, handleFileUpload } from "../utils";
+import { Login } from "../redux/UserSlice";
 
-const UserForm = ({ open, setOpen }) => {
+const UserForm = ({ open, setOpen,success,setSuccess }) => {
   const { user } = useSelector((state) => state.user);
   const {
     register,
@@ -25,6 +26,8 @@ const UserForm = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const [profileImage, setProfileImage] = useState("");
   const [uploadCv, setUploadCv] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+
   const Navigate = useNavigate()
 
   const onSubmit = async (data) => {
@@ -40,11 +43,19 @@ const UserForm = ({ open, setOpen }) => {
       method:"PUT"
     })
 
-    if(res){
-      dispatch(Login(res));
-      localStorage.setItem("userInfo",JSON.stringify(res));
+    if(res?.data?.success === "failed"){
+      // dispatch(Login(res));
+      // localStorage.setItem("userInfo",JSON.stringify(res));
       // Navigate('/user-profile')
+      setErrMsg(res.data.message)
+      
+      // setOpen(false)
+    }else{
+            // dispatch(Login(res));
+      // localStorage.setItem("userInfo",JSON.stringify(res?.data?.data));
       setOpen(false)
+      setSuccess(true);
+      // Navigate('/user-profile')
     }
     }catch(err){
       console.log(err)
@@ -208,6 +219,12 @@ const UserForm = ({ open, setOpen }) => {
                       )}
                     </div>
 
+                    {errMsg && (
+              <span role='alert' className='text-sm text-red-500 mt-0.5'>
+                {errMsg}
+              </span>
+            )}
+
                     <div className='mt-4'>
                       <CustomButton
                         type='submit'
@@ -229,11 +246,13 @@ const UserForm = ({ open, setOpen }) => {
 const UserProfile = () => {
   const { user } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
+  let [success,setSuccess] = useState(false)
   const userInfo = user;
 
   return (
     <div className='container mx-auto flex items-center justify-center py-10'>
-      <div className='w-full md:w-2/3 2xl:w-2/4 bg-white shadow-lg p-10 pb-20 rounded-lg'>
+      <div className='w-full md:w-2/3 2xl:w-2/4 bg-white shadow-lg p-10 pb-20 rounded-lg'>    
+      <span className={`${success?"block bg-green-500 ":"hidden"} p-3 text-white  mb-2 rounded-2xl text-center text-xl`}>Thank you, your change has been updated, please log out and log in again to see the changes. In the future, you will be able to see updates immediately after updating your profile.</span>   
         <div className='flex flex-col items-center justify-center mb-4'>
           <h1 className='text-4xl font-semibold text-slate-600'>
             {userInfo?.firstName + " " + userInfo?.lastName}
@@ -284,7 +303,7 @@ const UserProfile = () => {
         </div>
       </div>
 
-      <UserForm open={open} setOpen={setOpen} />
+      <UserForm open={open} setOpen={setOpen} success={success} setSuccess = {setSuccess} />
     </div>
   );
 };

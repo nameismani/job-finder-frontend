@@ -6,7 +6,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 // import Header from "../components/Header";
 import { experience, jobTypes, jobs } from "../utils/data";
-import { CustomButton, JobCard, ListBox ,Header} from "../components";
+import { CustomButton, JobCard, ListBox ,Header, Loading} from "../components";
 import { apiRequest, updateURL } from "../utils";
 
 const FindJobs = () => {
@@ -40,6 +40,7 @@ const FindJobs = () => {
   const [numPage, setNumPage] = useState(1);
   const [recordsCount, setRecordsCount] = useState(0);
   const [data, setData] = useState([]);
+  const [isLoading,setIsLoading] = useState(true)
 
   const [searchQuery, setSearchQuery] = useState("");
   const [jobLocation, setJobLocation] = useState("");
@@ -71,17 +72,21 @@ const FindJobs = () => {
         method:"GET"
       })
 
-      console.log(res)
-      setNumPage(res?.data?.data?.numofPage);
-      setRecordsCount(res?.data?.data?.total);
+      // console.log(res)
+      setNumPage(res?.data?.numOfPage);
+      setRecordsCount(res?.data?.totalJobs);
       setData(res?.data?.data)
 
     }
     catch(err){
       console.log(err)
+    }finally{
+      setIsLoading(false)
     }
   }
+
 useEffect(()=>{
+
   if(expVal.length > 0){
     let newExpVal = [];
 
@@ -91,7 +96,7 @@ useEffect(()=>{
     })
 
     newExpVal.sort((a,b)=> a-b)
-    setFilterExp(`${newExpVal[0]}-${newExpVal[newExpVal?.length]}}`)
+    setFilterExp(`${newExpVal[0]}-${newExpVal[newExpVal?.length-1]}`)
   }
 },[expVal])
 
@@ -119,7 +124,8 @@ const handleShowMore = async (e)=>{
   };
 
   const filterExperience = async (e) => {
-    // setFilterExp(e);
+    setFilterExp(e);
+    // console.log(expVal)
     if(expVal?.includes(e)){
       console.log(e)
        setExpVal(expVal?.filter((el)=>el != e));
@@ -140,7 +146,8 @@ const handleShowMore = async (e)=>{
         location={jobLocation}
         setLocation={setJobLocation}
       />
-
+      
+     
       <div className='container mx-auto flex gap-6 2xl:gap-10 md:px-5 py-0 md:py-6 bg-[#f7fdfd]'>
         <div className='hidden md:flex flex-col w-1/6 h-fit bg-white shadow-sm'>
           <p className='text-lg font-semibold text-slate-600'>Filter Search</p>
@@ -215,7 +222,8 @@ const handleShowMore = async (e)=>{
           </div>
 
           <div className='w-full flex flex-wrap gap-4'>
-            {data?.map((job, index) => {
+          {isLoading &&  <Loading/>}
+          {!isLoading &&  (data?.map((job, index) => {
               let newJob = {
                 name:job?.company?.name,
                 logo:job?.company?.profileUrl,
@@ -223,13 +231,13 @@ const handleShowMore = async (e)=>{
               }
 
              return  <JobCard job={newJob} key={index} /> 
-             })}
+             }))}
           </div>
 
           {numPage > page && !isFetching && (
             <div className='w-full flex items-center justify-center pt-16'>
               <CustomButton
-              oncClick = {handleShowMore}
+              onClick = {handleShowMore}
                 title='Load More'
                 containerStyles={`text-blue-600 py-1.5 px-5 focus:outline-none hover:bg-blue-700 hover:text-white rounded-full text-base border border-blue-600`}
               />

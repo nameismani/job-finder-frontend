@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BiChevronDown } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
@@ -11,13 +11,30 @@ import CustomButton from "./CustomButton";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout } from "../redux/UserSlice";
 import { NoProfile } from "../assets";
+import { apiRequest } from "../utils";
+import LevelUpCounter from "./LevelUpCounter";
 
 function MenuList({ user, onClick }) {
  let  dispatch = useDispatch()
  let Navigate = useNavigate()
-  const handleLogout = () => {
+//  console.log(user.session.userId)
+  const handleLogout = async() => {
+    let URL = "auth/logout"
+    let res = await apiRequest({
+      url:URL,
+       data:{id:user.session.userId},
+      method:"POST",
+    })
+
+   if( res.data.success===true){
     dispatch(Logout())
     Navigate('/user-auth')
+   }
+   
+    
+
+    //  console.log(res)
+   
   };
 
   return (
@@ -80,6 +97,13 @@ function MenuList({ user, onClick }) {
               </Menu.Item>
 
               <Menu.Item>
+              {({ active }) => (
+                   <LevelUpCounter/>
+                )}
+             
+              </Menu.Item>
+
+              <Menu.Item>
                 {({ active }) => (
                   <button
                     onClick={() => handleLogout()}
@@ -97,6 +121,7 @@ function MenuList({ user, onClick }) {
                   </button>
                 )}
               </Menu.Item>
+
             </div>
           </Menu.Items>
         </Transition>
@@ -106,12 +131,18 @@ function MenuList({ user, onClick }) {
 }
 const Navbar = () => {
   const {user} = useSelector((state) => state.user);
+  const [hours, setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
 // const user = users[0]
   const [isOpen, setIsOpen] = useState(false);
+  const [logedIn,setLogedIn] = useState(false)
 // console.log(user.accountType)
   const handleCloseNavbar = () => {
     setIsOpen((prev) => !prev);
   };
+// console.log(user.userLogins.lastLoginTime)
+// user?.token?setLogedIn(true):null
 
   return (
     <>
@@ -148,7 +179,7 @@ const Navbar = () => {
               <Link to='/about-us'>About</Link>
             </li>
           </ul>
-
+        
           <div className='hidden lg:block'>
             {!user?.token ? (
               <Link to='/user-auth'>
@@ -163,7 +194,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-
+        
           <button
             className='block lg:hidden text-slate-900'
             onClick={handleCloseNavbar}

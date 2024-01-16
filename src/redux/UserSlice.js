@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import cookie from "js-cookie"
 import { users } from "../utils/data";
 
 const initialState = {
-  user: JSON.parse(window?.localStorage.getItem("userInfo")) ?? {}//JSON.parse(window?.localStorage.getItem("userInfo")) ?? users[1],
+  user: JSON.parse(window?.localStorage.getItem("userInfo")) ?? {} //JSON.parse(window?.localStorage.getItem("userInfo")) ?? users[1],
 };
 
 const userSlice = createSlice({
@@ -11,13 +11,15 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
-      console.log(action.payload.user)
-      console.log(state.user)
+      // console.log(action.payload.user)
+      // console.log(state.user)
       state.user = action.payload.user;
     },
     logout(state) {
       state.user = null;
       localStorage?.removeItem("userInfo");
+      cookie.remove("userInfo")
+      cookie.remove("connect.sid")
     },
   },
 });

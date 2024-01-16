@@ -8,11 +8,12 @@ const Companies = () => {
   const [page, setPage] = useState(1);
   const [numPage, setNumPage] = useState(1);
   const [recordsCount, setRecordsCount] = useState(0);
-  const [data, setData] = useState(companies ?? []);
+  const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [cmpLocation, setCmpLocation] = useState("");
   const [sort, setSort] = useState("Newest");
   const [isFetching, setIsFetching] = useState(false);
+  let [isLoading,setIsLoading] = useState(true)
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Companies = () => {
       navigate:navigate,
       location:location
     })
-    console.log(newURL)
+    // console.log(newURL)
     try{
       const res = await apiRequest({
         url:"companies" + newURL,
@@ -51,6 +52,8 @@ const Companies = () => {
     }
     catch(err){
       console.log(err)
+    }finally{
+      setIsLoading(false)
     }
   }
   useEffect(()=>{
@@ -81,13 +84,16 @@ const Companies = () => {
             <ListBox sort={sort} setSort={setSort} />
           </div>
         </div>
-
         <div className='w-full flex flex-col gap-6'>
-          {data?.map((cmp, index) => (
-            <CompanyCard cmp={cmp} key={index} />
-          ))}
+        {!isLoading && (
+          <>                  
+                  {data?.map((cmp, index) => (
+                    <CompanyCard cmp={cmp} key={index} />
+                  ))}
+            </>
+        )}
 
-          {isFetching && (
+          {isLoading && (
             <div className='mt-10'>
               <Loading />
             </div>

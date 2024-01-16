@@ -207,7 +207,7 @@ const CompanyProfile = () => {
   const [info, setInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [openForm, setOpenForm] = useState(false);
-
+//  console.log(user)
   const fetchCompany = async ()=>{
     setIsLoading(true);
     let id = null;
@@ -251,8 +251,8 @@ const CompanyProfile = () => {
             Welcome, {info?.name}
           </h2>
 
-          {user?.user?.accountType === undefined &&
-            info?._id === user?.user?._id && (
+          {user?.role === 2   &&  //accountType === undefined &&
+            info?._id === user?._id && (
               <div className='flex items-center justifu-center py-5 md:py-0 gap-4'>
                 <CustomButton
                   onClick={() => setOpenForm(true)}

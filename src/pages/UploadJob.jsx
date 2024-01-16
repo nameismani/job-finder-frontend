@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const UploadJob = () => {
 
   const {user} = useSelector(state => state.user)
-  console.log(user)
+  // console.log(user)
   let Navigate = useNavigate()
   const {
     register,
@@ -44,7 +44,8 @@ const UploadJob = () => {
      
       if(res?.data?.success === "failed"){
         console.log("failed")
-        setErrMsg({...res})
+        setErrMsg(res.data.message)
+        console.log(res)
       }
       else{
         // setErrMsg({status:'success',message:res.message})
@@ -69,7 +70,7 @@ const UploadJob = () => {
         method:"GET"       
       })
 
-      console.log(res.data.data.jobPosts)
+      // console.log(res.data.data.jobPosts)
       setRecentPost(res?.data?.data?.jobPosts)
     }
     catch(err){

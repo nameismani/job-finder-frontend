@@ -1,11 +1,12 @@
 
 import axios from "axios";
-const API_URL = "http://localhost:8000/api-v1"
+const API_URL = "https://nameismani-jobfinder.onrender.com/api-v1/"
 
 export const API = axios.create({
-    baseURL:API_URL,
-    responseType:"json",
-})
+    baseURL: API_URL,
+    responseType: "json",
+    withCredentials: true, 
+});
 
 export const apiRequest = async({url,token,data,method})=>{
 
@@ -63,6 +64,7 @@ export const updateURL = ({pageNum,query,cmpLoc,sort,navigate,location,jType,exp
  }
 
  if(exp){
+    // console.log(exp)
     params.set("exp",exp)
  }
 
